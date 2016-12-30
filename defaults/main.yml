@@ -1,0 +1,227 @@
+---
+# defaults file for ansible-role-openstack-neutron
+
+# # openstack public confg
+# openstack_db_host: ""
+# openstack_controller_host: ""
+# openstack_keystone_auth_uri: ""
+# openstack_keystone_auth_url: ""
+# openstack_admin_vip: ""
+# openstack_public_vip: ""
+# openstack_internal_vip: ""
+# openstack_rabbit_hosts: ""
+# nova_keystone_user: "nova"
+# nova_keystone_password: "nova"
+
+
+# neutron service
+neutron_service_region: RegionOne
+neutron_service_name: neutron
+neutron_service_type: network
+neutron_service_description: "OpenStack Networking"
+neutron_service_admin_url: "http://{{ openstack_admin_vip }}:9696"
+neutron_service_internal_url: "http://{{ openstack_internal_vip }}:9696"
+neutron_service_public_url: "http://{{ openstack_public_vip }}:9696"
+
+# neutron db
+neutron_db_host: "{{ openstack_db_host }}"
+neutron_db_name: "neutron"
+neutron_db_user: "neutron"
+neutron_db_password: "neutron"
+neutron_db_priv: "{{ neutron_db_name }}.*:ALL"
+
+# neutron rabbitmq
+neutron_rabbitmq_host: "{{ openstack_controller_host }}"
+neutron_rabbitmq_userid: 'neutron'
+neutron_rabbitmq_password: 'neutron'
+neutron_rabbitmq_vhost: '/neutron'
+
+# neutron keystone
+neutron_keystone_user: "neutron"
+neutron_keystone_password: "neutron"
+
+# neutron network option
+neutron_network_lxb: True
+neutron_network_ovs: False
+neutron_network_option: "provider"
+neutron_public_interface: "eth1"
+
+# neutron config
+neutron_core_plugin: "ml2"
+neutron_service_plugins: ""
+neutron_rpc_backend: "rabbit"
+neutron_auth_strategy: "keystone"
+neutron_nova_url: "http://{{ openstack_controller_host }}:8774/v2"
+neutron_nova_username: "{{ nova_keystone_user }}"
+neutron_nova_password: "{{ nova_keystone_password }}"
+neutron_verbose: "True"
+neutron_lock_path: "/var/lib/neutron/tmp"
+neutron_bind_host: "{{ mgmt_ip }}"
+neutron_dhcp_lease_duration: -1
+neutron_dhcp_agents_per_network: 3
+neutron_quota_port: -1
+
+## neutron rabbitmq config
+neutron_rabbit_hosts: "{{ openstack_rabbit_hosts | default('{{ openstack_controller_host }}') }}"
+neutron_rabbit_retry_interval: 1
+neutron_rabbit_retry_backoff: 2
+neutron_rabbit_max_retries: 0
+neutron_rabbit_durable_queues: "true"
+neutron_rabbit_ha_queues: "true"
+
+# neutron ml2 config
+neutron_ml2_type_drivers: "flat,vlan"
+neutron_ml2_tenant_network_types: ""
+neutron_ml2_mechanism_drivers: "linuxbridge"
+neutron_ml2_extension_drivers: "port_security"
+neutron_ml2_flat_networks: "public"
+neutron_ml2_enable_ipset: "True"
+neutron_network_vlan_ranges: "public"
+
+# neutron ml2 lxb config
+neutron_ml2_physical_interface_mappings: "public:{{ neutron_public_interface }}"
+neutron_ml2_enable_vxlan: "False"
+neutron_ml2_prevent_arp_spoofing: "True"
+neutron_ml2_enable_security_group: "True"
+neutron_ml2_firewall_driver: "neutron.agent.linux.iptables_firewall.IptablesFirewallDriver"
+
+# neutron dhcp config
+neutron_dhcp_interface_driver: "neutron.agent.linux.interface.BridgeInterfaceDriver"
+neutron_dhcp_dhcp_driver: "neutron.agent.linux.dhcp.Dnsmasq"
+neutron_dhcp_enable_isolated_metadata: "True"
+
+# neutron metadata config
+neutron_metadata_nova_metadata_ip: "{{ openstack_controller_host }}"
+neutron_metadata_proxy_shared_secret: "openstack"
+
+# neutron nova config
+neutron_url: "http://{{ openstack_controller_host }}:9696"
+neutron_nova_service_metadata_proxy: "True"
+
+neutron_config:
+  - { section: "database", param: "connection", value: "mysql://{{ neutron_db_user }}:{{ neutron_db_password }}@{{ neutron_db_host }}/{{ neutron_db_name }}" }
+  - { section: "DEFAULT", param: "verbose", value: "{{ neutron_verbose }}" }
+  - { section: "DEFAULT", param: "core_plugin", value: "{{ neutron_core_plugin }}" }
+  - { section: "DEFAULT", param: "service_plugins", value: "{{ neutron_service_plugins }}" }
+  - { section: "DEFAULT", param: "rpc_backend", value: "{{ neutron_rpc_backend }}" }
+  - { section: "DEFAULT", param: "auth_strategy", value: "{{ neutron_auth_strategy }}" }
+  - { section: "DEFAULT", param: "notify_nova_on_port_status_changes", value: "True" }
+  - { section: "DEFAULT", param: "notify_nova_on_port_data_changes", value: "True" }
+  - { section: "DEFAULT", param: "nova_url", value: "{{ neutron_nova_url }}" }
+  - { section: "DEFAULT", param: "bind_host", value: "{{ neutron_bind_host }}" }
+  - { section: "DEFAULT", param: "dhcp_lease_duration", value: "{{ neutron_dhcp_lease_duration }}" }
+  - { section: "DEFAULT", param: "dhcp_agents_per_network", value: "{{ neutron_dhcp_agents_per_network }}" }
+  - { section: "DEFAULT", param: "l3_ha", value: "True" }
+  - { section: "DEFAULT", param: "allow_automatic_l3agent_failover", value: "True" }
+  - { section: "quotas", param: "quota_port", value: "{{ neutron_quota_port }}" }
+  - { section: "keystone_authtoken", param: "auth_uri", value: "{{ openstack_keystone_auth_uri }}" }
+  - { section: "keystone_authtoken", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "keystone_authtoken", param: "auth_plugin", value: "password" }
+  - { section: "keystone_authtoken", param: "project_domain_id", value: "default" }
+  - { section: "keystone_authtoken", param: "user_domain_id", value: "default" }
+  - { section: "keystone_authtoken", param: "project_name", value: "service" }
+  - { section: "keystone_authtoken", param: "username", value: "{{ neutron_keystone_user }}" }
+  - { section: "keystone_authtoken", param: "password", value: "{{ neutron_keystone_password }}" }
+  - { section: "nova", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "nova", param: "auth_plugin", value: "password" }
+  - { section: "nova", param: "project_domain_id", value: "default" }
+  - { section: "nova", param: "user_domain_id", value: "default" }
+  - { section: "nova", param: "region_name", value: "{{ neutron_service_region }}" }
+  - { section: "nova", param: "project_name", value: "service" }
+  - { section: "nova", param: "username", value: "{{ neutron_nova_username }}" }
+  - { section: "nova", param: "password", value: "{{ neutron_nova_password }}" }
+  - { section: "oslo_concurrency", param: "lock_path", value: "{{ neutron_lock_path }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_userid", value: "{{ neutron_rabbitmq_userid }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_password", value: "{{ neutron_rabbitmq_password }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_virtual_host", value: "{{ neutron_rabbitmq_vhost }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_hosts", value: "{{ neutron_rabbit_hosts }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_retry_interval", value: "{{ neutron_rabbit_retry_interval }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_retry_backoff", value: "{{ neutron_rabbit_retry_backoff }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_max_retries", value: "{{ neutron_rabbit_max_retries }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_durable_queues", value: "{{ neutron_rabbit_durable_queues }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_ha_queues", value: "{{ neutron_rabbit_ha_queues }}" }
+
+
+neutron_ml2_config:
+  - { section: "ml2", param: "type_drivers", value: "{{ neutron_ml2_type_drivers }}" }
+  - { section: "ml2", param: "tenant_network_types", value: "{{ neutron_ml2_tenant_network_types }}" }
+  - { section: "ml2", param: "mechanism_drivers", value: "{{ neutron_ml2_mechanism_drivers }}" }
+  - { section: "ml2", param: "extension_drivers", value: "{{ neutron_ml2_extension_drivers }}" }
+  - { section: "ml2_type_flat", param: "flat_networks", value: "{{ neutron_ml2_flat_networks }}" }
+  - { section: "securitygroup", param: "enable_ipset", value: "{{ neutron_ml2_enable_ipset }}" }
+  - { section: "ml2_type_vlan", param: "network_vlan_ranges", value: "{{ neutron_network_vlan_ranges }}" }
+
+neutron_ml2_lxb_config:
+  - { section: "linux_bridge", param: "physical_interface_mappings", value: "{{ neutron_ml2_physical_interface_mappings }}" }
+  - { section: "vxlan", param: "enable_vxlan", value: "{{ neutron_ml2_enable_vxlan }}" }
+  - { section: "agent", param: "prevent_arp_spoofing", value: "{{ neutron_ml2_prevent_arp_spoofing }}" }
+  - { section: "securitygroup", param: "enable_security_group", value: "{{ neutron_ml2_enable_security_group }}" }
+  - { section: "securitygroup", param: "firewall_driver", value: "{{ neutron_ml2_firewall_driver }}" }
+
+neutron_dhcp_config:
+  - { section: "DEFAULT", param: "interface_driver", value: "{{ neutron_dhcp_interface_driver }}" }
+  - { section: "DEFAULT", param: "dhcp_driver", value: "{{ neutron_dhcp_dhcp_driver }}" }
+  - { section: "DEFAULT", param: "enable_isolated_metadata", value: "{{ neutron_dhcp_enable_isolated_metadata }}" }
+  - { section: "DEFAULT", param: "verbose", value: "{{ neutron_verbose }}" }
+
+neutron_metadata_config:
+  - { section: "DEFAULT", param: "auth_uri", value: "{{ openstack_keystone_auth_uri }}" }
+  - { section: "DEFAULT", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "DEFAULT", param: "auth_region", value: "{{ neutron_service_region }}" }
+  - { section: "DEFAULT", param: "auth_plugin", value: "password" }
+  - { section: "DEFAULT", param: "project_domain_id", value: "default" }
+  - { section: "DEFAULT", param: "user_domain_id", value: "default" }
+  - { section: "DEFAULT", param: "project_name", value: "service" }
+  - { section: "DEFAULT", param: "username", value: "{{ neutron_keystone_user }}" }
+  - { section: "DEFAULT", param: "password", value: "{{ neutron_keystone_password }}" }
+  - { section: "DEFAULT", param: "nova_metadata_ip", value: "{{ neutron_metadata_nova_metadata_ip }}" }
+  - { section: "DEFAULT", param: "metadata_proxy_shared_secret", value: "{{ neutron_metadata_proxy_shared_secret }}" }
+  - { section: "DEFAULT", param: "verbose", value: "{{ neutron_verbose }}" }
+
+neutron_nova_config:
+  - { section: "neutron", param: "url", value: "{{ neutron_url }}" }
+  - { section: "neutron", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "neutron", param: "auth_plugin", value: "password" }
+  - { section: "neutron", param: "project_domain_id", value: "default" }
+  - { section: "neutron", param: "user_domain_id", value: "default" }
+  - { section: "neutron", param: "region_name", value: "{{ neutron_service_region }}" }
+  - { section: "neutron", param: "project_name", value: "service" }
+  - { section: "neutron", param: "username", value: "{{ neutron_keystone_user }}" }
+  - { section: "neutron", param: "password", value: "{{ neutron_keystone_password }}" }
+  - { section: "neutron", param: "service_metadata_proxy", value: "{{ neutron_nova_service_metadata_proxy }}" }
+  - { section: "neutron", param: "metadata_proxy_shared_secret", value: "{{ neutron_metadata_proxy_shared_secret }}" }
+
+neutron_compute_config:
+  - { section: "DEFAULT", param: "rpc_backend", value: "{{ neutron_rpc_backend }}" }
+  - { section: "DEFAULT", param: "auth_strategy", value: "{{ neutron_auth_strategy }}" }
+  - { section: "DEFAULT", param: "verbose", value: "{{ neutron_verbose }}" }
+  - { section: "DEFAULT", param: "dhcp_lease_duration", value: "{{ neutron_dhcp_lease_duration }}" }
+  - { section: "keystone_authtoken", param: "auth_uri", value: "{{ openstack_keystone_auth_uri }}" }
+  - { section: "keystone_authtoken", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "keystone_authtoken", param: "auth_plugin", value: "password" }
+  - { section: "keystone_authtoken", param: "project_domain_id", value: "default" }
+  - { section: "keystone_authtoken", param: "user_domain_id", value: "default" }
+  - { section: "keystone_authtoken", param: "project_name", value: "service" }
+  - { section: "keystone_authtoken", param: "username", value: "{{ neutron_keystone_user }}" }
+  - { section: "keystone_authtoken", param: "password", value: "{{ neutron_keystone_password }}" }
+  - { section: "oslo_concurrency", param: "lock_path", value: "{{ neutron_lock_path }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_userid", value: "{{ neutron_rabbitmq_userid }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_password", value: "{{ neutron_rabbitmq_password }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_virtual_host", value: "{{ neutron_rabbitmq_vhost }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_hosts", value: "{{ neutron_rabbit_hosts }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_retry_interval", value: "{{ neutron_rabbit_retry_interval }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_retry_backoff", value: "{{ neutron_rabbit_retry_backoff }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_max_retries", value: "{{ neutron_rabbit_max_retries }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_durable_queues", value: "{{ neutron_rabbit_durable_queues }}" }
+  - { section: "oslo_messaging_rabbit", param: "rabbit_ha_queues", value: "{{ neutron_rabbit_ha_queues }}" }
+
+neutron_compute_nova_config:
+  - { section: "neutron", param: "url", value: "{{ neutron_url }}" }
+  - { section: "neutron", param: "auth_url", value: "{{ openstack_keystone_auth_url }}" }
+  - { section: "neutron", param: "auth_plugin", value: "password" }
+  - { section: "neutron", param: "project_domain_id", value: "default" }
+  - { section: "neutron", param: "user_domain_id", value: "default" }
+  - { section: "neutron", param: "region_name", value: "{{ neutron_service_region }}" }
+  - { section: "neutron", param: "project_name", value: "service" }
+  - { section: "neutron", param: "username", value: "{{ neutron_keystone_user }}" }
+  - { section: "neutron", param: "password", value: "{{ neutron_keystone_password }}" }

@@ -1,0 +1,36 @@
+---
+# vars file for Redhat
+
+neutron_lxb_packages:
+    - openstack-neutron
+    - openstack-neutron-ml2
+    - openstack-neutron-linuxbridge
+    - python-neutronclient
+    - ebtables
+    - ipset
+
+neutron_ovs_packages: []
+
+neutron_lxb_compute_packages:
+  - openstack-neutron
+  - openstack-neutron-linuxbridge
+  - ebtables
+  - ipset
+
+neutron_ovs_compute_packages: []
+
+neutron_lxb_system_service_name:
+    - neutron-server
+    - neutron-linuxbridge-agent
+    - neutron-dhcp-agent
+    - neutron-metadata-agent
+
+neutron_lxb_compute_system_service_name:
+  - neutron-linuxbridge-agent
+
+neutron_config_location: /etc/neutron/neutron.conf
+neutron_ml2_config_location: /etc/neutron/plugins/ml2/ml2_conf.ini
+neutron_ml2_lxb_config_location: /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+neutron_dhcp_config_location: /etc/neutron/dhcp_agent.ini
+neutron_metadata_config_location: /etc/neutron/metadata_agent.ini
+neutron_nova_config_location: /etc/nova/nova.conf

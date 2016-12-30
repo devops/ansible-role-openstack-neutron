@@ -1,0 +1,16 @@
+---
+- name: Configure neutron nova.
+  shell: |
+    openstack-config --set "{{ neutron_nova_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_nova_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+- name: Configure neutron compute nova.
+  shell: |
+    openstack-config --set "{{ neutron_nova_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_compute_nova_config }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']

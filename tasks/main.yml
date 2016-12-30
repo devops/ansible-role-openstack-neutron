@@ -1,0 +1,26 @@
+---
+# tasks file for ansible-role-openstack-neutron
+
+# Variable setup.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include: neutron_service_setup.yml
+  run_once: True
+  when:
+    - "inventory_hostname in groups['neutron_controller']"
+
+# Setup/Install tasks.
+- include: neutron_install_RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  tags: neutron_install
+# Configure tasks.
+- include: neutron_configure.yml
+  tags: neutron_configure
+# DB tasks.
+- include: neutron_db_setup.yml
+  when:
+    - "inventory_hostname in groups['neutron_controller']"
+
+# Finalize installation tasks.
+- include: neutron_post_install.yml

@@ -1,0 +1,26 @@
+---
+# handlers file for ansible-role-openstack-neutron
+
+- name: restart lxb neutron
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - "{{ neutron_lxb_system_service_name }}"
+
+- name: restart lxb neutron compute
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - "{{ neutron_lxb_compute_system_service_name }}"
+
+- name: restart nova api
+  service:
+    name: "openstack-nova-api"
+    state: restarted
+
+- name: restart nova compute
+  service:
+    name: "openstack-nova-compute"
+    state: restarted

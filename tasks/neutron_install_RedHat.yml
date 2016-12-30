@@ -1,0 +1,38 @@
+---
+# tasks file for neutron install on RedHat
+
+- name: Install OpenStack neutron controller packages(lxb).
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ neutron_lxb_packages }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+    - neutron_network_lxb | bool
+
+- name: Install OpenStack neutron controller packages(ovs).
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ neutron_ovs_packages }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+    - neutron_network_ovs | bool
+
+- name: Install OpenStack neutron compute packages(lxb).
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ neutron_lxb_compute_packages }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+    - neutron_network_lxb | bool
+
+- name: Install OpenStack neutron compute packages(ovs).
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ neutron_ovs_compute_packages }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+    - neutron_network_ovs | bool

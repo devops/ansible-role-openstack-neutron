@@ -1,0 +1,36 @@
+---
+# tasks file for openstack-neutron post install
+
+## Controller
+- name: Ensure ml2 config symbolic is exists.
+  file:
+    src: "{{ neutron_ml2_config_location }}"
+    dest: /etc/neutron/plugin.ini
+    state: link
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+- name: Ensure openstack neutron services is started and enabled at boot.
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ neutron_lxb_system_service_name }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+    - neutron_network_lxb | bool
+
+## Compute
+- name: Ensure openstack neutron compute services is started and enabled at boot.
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ neutron_lxb_compute_system_service_name }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+    - neutron_network_lxb | bool
+  notify:
+    - restart nova compute

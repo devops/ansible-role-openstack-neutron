@@ -1,0 +1,55 @@
+---
+# Controller
+- name: Configure neutron controller(1).
+  shell: |
+    openstack-config --set "{{ neutron_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+- name: Configure neutron controller(ml2).
+  shell: |
+    openstack-config --set "{{ neutron_ml2_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_ml2_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+- name: Configure neutron controller(lxb-agent).
+  shell: |
+    openstack-config --set "{{ neutron_ml2_lxb_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_ml2_lxb_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+- name: Configure neutron controller(dhcp-agent).
+  shell: |
+    openstack-config --set "{{ neutron_dhcp_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_dhcp_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+
+# Compute
+- name: Configure neutron compute.
+  shell: |
+    openstack-config --set "{{ neutron_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_compute_config }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+  tags:
+    - neutron-compute-config
+
+- name: Configure neutron compute(lxb-agent).
+  shell: |
+    openstack-config --set "{{ neutron_ml2_lxb_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_ml2_lxb_config }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+  tags:
+    - neutron-compute-config

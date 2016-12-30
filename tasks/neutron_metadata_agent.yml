@@ -1,0 +1,6 @@
+---
+- name: Configure neutron metadata.
+  shell: |
+    openstack-config --set "{{ neutron_metadata_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_metadata_config }}"

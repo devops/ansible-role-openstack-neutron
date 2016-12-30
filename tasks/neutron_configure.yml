@@ -1,0 +1,18 @@
+---
+# neutron network linux bridge
+- include: neutron_network_lxb.yml
+  when:
+    - neutron_network_lxb | bool
+
+# neutron network openvswitch
+- include: neutron_network_ovs.yml
+  when:
+    - neutron_network_ovs | bool
+
+# neutron metadata agent
+- include: neutron_metadata_agent.yml
+  when:
+    - inventory_hostname in groups['neutron_controller']
+
+# neutron nova
+- include: neutron_nova.yml

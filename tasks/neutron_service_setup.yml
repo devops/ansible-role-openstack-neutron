@@ -1,0 +1,32 @@
+---
+# tasks file for openstack-neutron service setup
+
+- name: Create the service credentials for neutron.
+  shell: |
+    openstack user create --domain default --password "{{ neutron_keystone_password }}" "{{ neutron_keystone_user }}"
+    openstack role add --project service --user {{ neutron_keystone_user }} admin
+  environment:
+    - "{{ token_auth_env }}"
+
+- name: Create the service entity for neutron.
+  shell: |
+    openstack service create --name "{{ neutron_service_name }}" --description "{{ neutron_service_description }}" "{{ neutron_service_type }}"
+  environment:
+    - "{{ token_auth_env }}"
+
+# Create the API endpoint for neutron.
+- name: Check if API endpoint exists for service "{{ neutron_service_type }}"
+  shell: "openstack endpoint list --service {{ neutron_service_type }}"
+  register: check_endpoint_result
+  environment:
+    - "{{ token_auth_env }}"
+  ignore_errors: True
+
+- name: "Specify API endpoints for {{ neutron_service_type }} service"
+  when: check_endpoint_result.rc == 0
+  shell: |
+    openstack endpoint create --region {{ neutron_service_region }} {{ neutron_service_type }} public {{ neutron_service_public_url }}
+    openstack endpoint create --region {{ neutron_service_region }} {{ neutron_service_type }} internal {{ neutron_service_internal_url }}
+    openstack endpoint create --region {{ neutron_service_region }} {{ neutron_service_type }} admin {{ neutron_service_admin_url }}
+  environment:
+    - "{{ token_auth_env }}"

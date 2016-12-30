@@ -1,0 +1,10 @@
+---
+# tasks file for neutron DB Setup
+
+- name: DB sync for neutron.
+  shell: |
+    su -s /bin/sh -c "neutron-db-manage --config-file {{ neutron_config_location }} \
+         --config-file {{ neutron_ml2_config_location }} upgrade head" neutron
+  ignore_errors: True
+  run_once: True
+  notify: restart nova api
