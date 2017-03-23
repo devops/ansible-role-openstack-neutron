@@ -14,9 +14,11 @@
 - include: neutron_install_RedHat.yml
   when: ansible_os_family == 'RedHat'
   tags: neutron_install
+
 # Configure tasks.
 - include: neutron_configure.yml
   tags: neutron_configure
+
 # DB tasks.
 - include: neutron_db_setup.yml
   when:

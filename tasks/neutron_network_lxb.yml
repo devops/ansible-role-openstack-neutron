@@ -32,6 +32,15 @@
   when:
     - inventory_hostname in groups['neutron_controller']
 
+- name: Configure neutron controller(l3-agent).
+  shell: |
+    openstack-config --set "{{ neutron_l3_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ neutron_l3_config }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+    - neutron_l3_agent | bool
+
 
 # Compute
 - name: Configure neutron compute.

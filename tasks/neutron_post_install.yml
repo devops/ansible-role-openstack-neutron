@@ -21,8 +21,19 @@
     - inventory_hostname in groups['neutron_controller']
     - neutron_network_lxb | bool
 
+- name: Ensure openstack neutron layer-3 services is started and enabled at boot.
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ neutron_l3_agent_service_name }}"
+  when:
+    - inventory_hostname in groups['neutron_controller']
+    - neutron_l3_agent | bool
+
 ## Compute
-- name: Ensure openstack neutron compute services is started and enabled at boot.
+- name: Ensure openstack neutron compute services is started and enabled at boot(lxb).
   service:
     name: "{{ item }}"
     state: started
@@ -32,5 +43,18 @@
   when:
     - inventory_hostname in groups['neutron_compute']
     - neutron_network_lxb | bool
+  notify:
+    - restart nova compute
+
+- name: Ensure openstack neutron compute services is started and enabled at boot(ovs).
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ neutron_ovs_compute_system_service_name }}"
+  when:
+    - inventory_hostname in groups['neutron_compute']
+    - neutron_network_ovs | bool
   notify:
     - restart nova compute
